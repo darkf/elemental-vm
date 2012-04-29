@@ -20,23 +20,25 @@ int vm_init(vm_t *vm)
 
 int vm_begin(vm_t *vm)
 {
-	/* sets register 0 to literal value 123 */
+	/* this little program sets register 0 to literal value 123 */
+	vm->reg[IP] = 0x0;			/* program is at 0x0 */
 	vm->mem[0x0] = OP_MOV32;
 	vm->mem[0x1] = (0x0 << 4) | (0x3);	/* register, literal */
-	vm->mem[0x2] = 0;	/* big-endian 32-bit 0 */
+	vm->mem[0x2] = 0;			/* big-endian 32-bit 0 */
 	vm->mem[0x3] = 0;
 	vm->mem[0x4] = 0;
 	vm->mem[0x5] = 0;
-	vm->mem[0x6] = 0;	/* big-endian 32-bit 123 */
+	vm->mem[0x6] = 0;			/* big-endian 32-bit 123 */
 	vm->mem[0x7] = 0;
 	vm->mem[0x8] = 0;
 	vm->mem[0x9] = 123;
 	vm->mem[0xA] = OP_HALT;
 
-	/* run this program we stored at address 0x0 */
-	cpu_run(vm, 0x0);
+	/* run the program */
+	cpu_run(vm);
 
-	/* pure debug code here */
+	/* pure debug code here -- check if the
+	   program worked */
 	printf("register 0 = %ld\n", vm->reg[0]);
 
 	return 0;
