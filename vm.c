@@ -24,11 +24,11 @@ int vm_begin(vm_t *vm)
 	vm->reg[IP] = 0x0;			/* program is at 0x0 */
 	vm->mem[0x0] = OP_MOV32;
 	vm->mem[0x1] = (0x0 << 4) | (0x3);	/* register, literal */
-	vm->mem[0x2] = 0;			/* big-endian 32-bit 0 */
+	vm->mem[0x2] = 0;			/* dest: big-endian 32-bit 0 */
 	vm->mem[0x3] = 0;
 	vm->mem[0x4] = 0;
 	vm->mem[0x5] = 0;
-	vm->mem[0x6] = 0;			/* big-endian 32-bit 123 */
+	vm->mem[0x6] = 0;			/* src: big-endian 32-bit 123 */
 	vm->mem[0x7] = 0;
 	vm->mem[0x8] = 0;
 	vm->mem[0x9] = 123;
