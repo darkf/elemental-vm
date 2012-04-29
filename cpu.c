@@ -6,6 +6,7 @@
 
 #define READ vm->mem[pc++]
 #define READ_32 (vm->mem[pc+=4, pc-4])
+#define TWO_OPERANDS (oprA=&READ_32, oprB=&READ_32)
 #define PEEK vm->mem[pc]
 
 unsigned long* operand_pointer(vm_t *vm, int optype, unsigned long* dat)
@@ -25,6 +26,8 @@ unsigned long* operand_pointer(vm_t *vm, int optype, unsigned long* dat)
 void cpu_run(vm_t *vm, int pc)
 {
 	int oper, typf, typA, typB;
+	unsigned long *oprA, *oprB;
+
 	while(1) {
 		/* read in the instruction code */
 		oper = READ;
@@ -37,8 +40,9 @@ void cpu_run(vm_t *vm, int pc)
 		switch(oper) {
 			case OP_HALT:	return;
 			case OP_MOV32:
-				*operand_pointer(vm, typA, &READ_32) =
-				 *operand_pointer(vm, typB, &READ_32);	/* possible undefined behaviour */
+				TWO_OPERANDS;
+				*operand_pointer(vm, typA, oprA) =
+				 *operand_pointer(vm, typB, oprB);
 				break;
 			default:	printf("Sorry, instruction 0x%x is not in "
 					       "my repertoire at the moment.\n", oper);
