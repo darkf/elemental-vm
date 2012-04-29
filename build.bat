@@ -1,0 +1,1 @@
+@gcc -Wall -pedantic vm.c main.c -o elemental.exe
