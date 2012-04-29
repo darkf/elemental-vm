@@ -8,22 +8,16 @@
 #include "vm.h"
 #include "op.h"
 
-/* global stuff */
-int *mem;
-int regs[32+3]; /* 32 GP + FLAG + SP + IP */
-
-#define MEM_LENGTH 1024*1024*32 /* 32 mb */
-
-int vm_init()
+int vm_init(vm_t *vm)
 {
-	mem = (int *) malloc(MEM_LENGTH); 
-	memset(mem, 0, MEM_LENGTH);
-	memset(regs, 0, sizeof(regs));
+	vm->mem = (int *) malloc(MEM_LENGTH); 
+	memset(vm->mem, 0, MEM_LENGTH);
+	memset(vm->regs, 0, sizeof(vm->regs));
 
 	return 1;
 }
 
-int vm_begin()
+int vm_begin(vm_t *vm)
 {
 	return 0;
 }
