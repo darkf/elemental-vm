@@ -1,1 +1,1 @@
-@gcc -Wall -pedantic vm.c main.c -o elemental.exe
+@gcc -Wall -pedantic vm.c bios.c main.c -o elemental.exe
