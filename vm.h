@@ -1,7 +1,8 @@
 #ifndef VM_H_INCLUDED
 #define VM_H_INCLUDED
 
-#define MEM_LENGTH 1024*1024*32 /* 32 mb */
+#define MEM_LENGTH (1024*1024*32) /* 32 mb */
+#define STACK_SIZE (1024)
 
 #define FLAG	(32+1-1)
 #define SP	(32+2-1)

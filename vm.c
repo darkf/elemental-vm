@@ -9,8 +9,6 @@
 #include "op.h"
 #include "cpu.h"
 
-#define STACK_SIZE (1024)
-
 void load_program(vm_t *vm, unsigned long ptr)
 {
 	/* this little program sets register 0 to literal value 123 */
