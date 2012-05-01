@@ -18,12 +18,18 @@ int vm_init(vm_t *vm)
 	return 1;
 }
 
+int vm_quit(vm_t *vm)
+{
+	free(vm->mem);
+	return 1;
+}
+
 int vm_begin(vm_t *vm)
 {
 	/* this little program sets register 0 to literal value 123 */
 	vm->reg[IP] = 0x0;			/* program is at 0x0 */
 	vm->mem[0x0] = OP_MOV32;
-	vm->mem[0x1] = (0x0 << 4) | (0x3);	/* register, literal */
+	vm->mem[0x1] = (REGISTER << 4) | LITERAL;
 	vm->mem[0x2] = 0;			/* dest: big-endian 32-bit 0 */
 	vm->mem[0x3] = 0;
 	vm->mem[0x4] = 0;

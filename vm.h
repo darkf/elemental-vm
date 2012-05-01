@@ -14,5 +14,6 @@ typedef struct {
 
 int vm_init(vm_t *);
 int vm_begin(vm_t *);
+int vm_quit(vm_t *);
 
 #endif

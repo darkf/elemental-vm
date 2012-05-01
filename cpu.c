@@ -18,9 +18,9 @@ unsigned long* operand_pointer(vm_t *vm, int optype, unsigned long* dat)
 	switch(optype) {
 		case REGISTER:	return &vm->reg[be32];
 		case MEMORY:	return &vm->mem[be32];
-		case DEREF:	return &vm->mem[vm->mem[be32]];
+		case DEREF:		return &vm->mem[vm->mem[be32]];
 		case LITERAL:	return &be32;
-		default:	printf("Illegal operand type %d\n", optype); return NULL;
+		default:		printf("Illegal operand type %d\n", optype); return NULL;
 	}
 }
 
