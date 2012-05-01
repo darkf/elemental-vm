@@ -10,6 +10,7 @@
 typedef struct {
 	unsigned long *mem;
 	unsigned long reg[32+3]; /* 32 GP + FLAG + SP + IP */
+	unsigned long base_addr;
 } vm_t;
 
 int vm_init(vm_t *);

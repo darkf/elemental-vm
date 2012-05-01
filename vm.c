@@ -11,7 +11,7 @@
 
 #define STACK_SIZE (1024)
 
-void load_program(vm_t *vm, long ptr)
+void load_program(vm_t *vm, unsigned long ptr)
 {
 	/* this little program sets register 0 to literal value 123 */
 	vm->reg[IP] = ptr;			/* program is at 0x0 */
@@ -38,8 +38,8 @@ int vm_init(vm_t *vm)
 	base = 0x00300000; /* end of VRAM */
 	vm->reg[SP] = base;
 	base += STACK_SIZE;
-	load_program(vm, base);
 
+	vm->base_addr = base;
 	return 1;
 }
 
@@ -51,6 +51,8 @@ int vm_quit(vm_t *vm)
 
 int vm_begin(vm_t *vm)
 {
+	load_program(vm, vm->base_addr);
+
 	/* run the program */
 	cpu_run(vm);
 
