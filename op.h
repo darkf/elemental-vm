@@ -15,7 +15,7 @@ enum OP {
 	OP_COUNT
 };
 
-static char* opnames[] = {
+char* opnames[] = {
 	"OP_NOP",
 	"OP_ZERO",
 	"OP_MOV8", "OP_MOV16", "OP_MOV32",
