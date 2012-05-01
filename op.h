@@ -26,6 +26,13 @@ enum {
         LITERAL
 };
 
+typedef struct {
+	long data;
+	int type;
+} operand_t;
+
 const char *op_tostr(int op);
+void long_to_literal(operand_t *operand, long n);
+void long_to_register(operand_t *operand, long reg);
 
 #endif

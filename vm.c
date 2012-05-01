@@ -9,21 +9,27 @@
 #include "op.h"
 #include "cpu.h"
 
+
+
+unsigned long op_emit(vm_t *vm, long op, operand_t *a, operand_t *b, unsigned long ptr)
+{
+	vm->mem[ptr++] = op;
+	if(a != NULL && b != NULL) vm->mem[ptr++] = (a->type << 4) | b->type;
+	if(a != NULL) vm->mem[ptr++] = a->data;
+	if(b != NULL) vm->mem[ptr++] = b->data;
+	return ptr;
+}
+
 void load_program(vm_t *vm, unsigned long ptr)
 {
-	/* this little program sets register 0 to literal value 123 */
-	vm->reg[IP] = ptr;			/* program is at 0x0 */
-	vm->mem[ptr++] = OP_MOV32;
-	vm->mem[ptr++] = (REGISTER << 4) | LITERAL;
-	vm->mem[ptr++] = 0;			/* dest: big-endian 32-bit 0 */
-	vm->mem[ptr++] = 0;
-	vm->mem[ptr++] = 0;
-	vm->mem[ptr++] = 0;
-	vm->mem[ptr++] = 0;			/* src: big-endian 32-bit 123 */
-	vm->mem[ptr++] = 0;
-	vm->mem[ptr++] = 0;
-	vm->mem[ptr++] = 123;
-	vm->mem[ptr++] = OP_HALT;
+	operand_t a, b;
+	vm->reg[IP] = ptr;
+
+	long_to_register(&a, 0); /* reg 0 */
+	long_to_literal(&b, 123);
+	ptr = op_emit(vm, OP_MOV32, &a, &b, ptr);
+
+	op_emit(vm, OP_HALT, NULL, NULL, ptr);
 }
 
 int vm_init(vm_t *vm)

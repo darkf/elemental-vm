@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <string.h>
 #include "op.h"
 
 static const char* opnames[] = {
@@ -23,4 +23,16 @@ const char *op_tostr(int op)
 {
 	if(op > OP_COUNT) return NULL;
 	return opnames[op];
+}
+
+void long_to_literal(operand_t *operand, long n)
+{
+	operand->type = LITERAL;
+	operand->data = n;
+}
+
+void long_to_register(operand_t *operand, long reg)
+{
+	operand->type = REGISTER;
+	operand->data = reg;
 }
