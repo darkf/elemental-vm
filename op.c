@@ -1,8 +1,8 @@
-const char *op_tostr(int op)
+#include "op.h"
+#include <stdlib.h>
+
+const char *op_tostr(signed int op)
 {
-	const char *str = (const char *) malloc(6 /* len("mov.32") */ + 1);
-	switch(op) {
-		default: strcpy(str, "unknown");
-	}
-	return str;
+	if(op > OP_COUNT) return NULL;
+	return opnames[op];
 }
