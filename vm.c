@@ -38,7 +38,7 @@ void load_program(vm_t *vm, unsigned long ptr)
 	vm->reg[IP] = ptr;
 
 	long_to_register(&a, 0); /* reg 0 */
-	long_to_literal(&b, 123);
+	long_to_literal(&b, 123456789);
 	ptr = op_emit(vm, OP_MOV32, &a, &b, ptr);
 
 	op_emit(vm, OP_HALT, NULL, NULL, ptr);
