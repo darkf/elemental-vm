@@ -15,8 +15,20 @@ unsigned long op_emit(vm_t *vm, long op, operand_t *a, operand_t *b, unsigned lo
 {
 	vm->mem[ptr++] = op;
 	if(a != NULL && b != NULL) vm->mem[ptr++] = (a->type << 4) | b->type;
-	if(a != NULL) vm->mem[ptr++] = a->data;
-	if(b != NULL) vm->mem[ptr++] = b->data;
+	if(a != NULL) {
+		/* 32-bit big endian encoded over four bytes */
+		vm->mem[ptr++] = (a->data >> 24) & 0xff;
+		vm->mem[ptr++] = (a->data >> 16) & 0xff;
+		vm->mem[ptr++] = (a->data >> 8) & 0xff;
+		vm->mem[ptr++] = (a->data >> 0) & 0xff;
+	}
+	if(b != NULL) {
+		/* 32-bit big endian encoded over four bytes */
+		vm->mem[ptr++] = (b->data >> 24) & 0xff;
+		vm->mem[ptr++] = (b->data >> 16) & 0xff;
+		vm->mem[ptr++] = (b->data >> 8) & 0xff;
+		vm->mem[ptr++] = (b->data >> 0) & 0xff;
+	}
 	return ptr;
 }
 
