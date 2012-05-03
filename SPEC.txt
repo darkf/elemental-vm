@@ -70,6 +70,7 @@ CPU:
     - int N (interrupt)
     - cmp a, b (compare operands)
     - and/or/not/xor
+    - halt
 
     - Branching
       - b (branch unconditionally)
