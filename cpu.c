@@ -54,7 +54,7 @@ void cpu_run(vm_t *vm)
 				*operand_pointer(vm, typA, oprA) *= *operand_pointer(vm, typB, oprB);
 				break;
 			case OP_DIV:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) *= *operand_pointer(vm, typB, oprB);
+				*operand_pointer(vm, typA, oprA) /= *operand_pointer(vm, typB, oprB);
 				break;
 			case OP_MOD:	TWO_OPERANDS;
 				*operand_pointer(vm, typA, oprA) %= *operand_pointer(vm, typB, oprB);
@@ -76,6 +76,9 @@ void cpu_run(vm_t *vm)
 				break;
 			case OP_XOR:	TWO_OPERANDS;
 				*operand_pointer(vm, typA, oprA) ^= *operand_pointer(vm, typB, oprB);
+				break;
+			case OP_ZERO:	ONE_OPERAND;
+				*operand_pointer(vm, typA, oprA) = 0;
 				break;
 			default:
 				printf("Unknown instruction 0x%x\n", oper);

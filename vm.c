@@ -14,7 +14,12 @@
 unsigned long op_emit(vm_t *vm, long op, operand_t *a, operand_t *b, unsigned long ptr)
 {
 	vm->mem[ptr++] = op;
-	if(a != NULL && b != NULL) vm->mem[ptr++] = (a->type << 4) | b->type;
+	if(a != NULL)
+		if(b != NULL)	
+			vm->mem[ptr++] = (a->type << 4) | b->type;
+		else
+			vm->mem[ptr++] = (a->type << 4);
+
 	if(a != NULL) {
 		/* 32-bit big endian encoded over four bytes */
 		vm->mem[ptr++] = (a->data >> 24) & 0xff;
@@ -34,12 +39,16 @@ unsigned long op_emit(vm_t *vm, long op, operand_t *a, operand_t *b, unsigned lo
 
 void load_program(vm_t *vm, unsigned long ptr)
 {
-	operand_t a, b;
+	operand_t a, b, c;
 	vm->reg[IP] = ptr;
 
 	long_to_register(&a, 0); /* reg 0 */
-	long_to_literal(&b, 123456789);
-	ptr = op_emit(vm, OP_MOV32, &a, &b, ptr);
+	long_to_register(&b, 1); /* reg 1 */
+	long_to_literal(&c, 123456789);
+
+	ptr = op_emit(vm, OP_MOV32, &a, &c, ptr);
+	ptr = op_emit(vm, OP_MOV32, &b, &a, ptr);
+	ptr = op_emit(vm, OP_ZERO, &a, NULL, ptr);
 
 	op_emit(vm, OP_HALT, NULL, NULL, ptr);
 }
@@ -75,6 +84,7 @@ int vm_begin(vm_t *vm)
 	/* pure debug code here -- check if the
 	   program worked */
 	printf("register 0 = %ld\n", vm->reg[0]);
+	printf("register 1 = %ld\n", vm->reg[1]);
 
 	return 0;
 }
