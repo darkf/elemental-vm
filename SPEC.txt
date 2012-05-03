@@ -46,13 +46,13 @@ CPU:
     - Instructions are stored as follows:
       - one byte ubyte opcode
       - one byte for operand types (first nibble -> first operand (0 = register, 1 = memory location, 2 = memory dereference, 3 = integer literal), second nibble -> second operand)
-      - variable number of 32-bit ints for number of operands
+      - variable number of 32-bit (big-endian) ints for number of operands
 
       e.g. add $0, 10
         OP_ADD (1 byte)
         0b0000 0b0011 (first nibble indicates a register, second nibble indicates a literal)
-        0 (32-bit word for operand 0)
-        10 (32-bit word for literal 10)
+        0 (32-bit big-endian word for operand 0)
+        10 (32-bit big-endian word for literal 10)
 
   - Instruction set:
 
