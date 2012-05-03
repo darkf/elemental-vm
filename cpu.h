@@ -1,4 +1,4 @@
 #include "vm.h"
 
 void cpu_run(vm_t *vm);
-unsigned long* operand_pointer(vm_t *vm, int optype, byte* dat);
+unsigned long* operand_pointer(vm_t *vm, int optype, ubyte* dat);

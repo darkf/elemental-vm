@@ -10,10 +10,10 @@
 #define SP	(32+2-1)
 #define IP	(32+3-1)
 
-typedef uint8_t byte;
+typedef uint8_t ubyte;
 
 typedef struct {
-	byte *mem;		 /* byte indexing */
+	ubyte *mem;		 /* byte indexing */
 	unsigned long reg[32+3]; /* 32 GP + FLAG + SP + IP */
 	unsigned long base_addr;
 } vm_t;
