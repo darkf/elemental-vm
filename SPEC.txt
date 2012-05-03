@@ -1,0 +1,75 @@
+PC:
+  - 1024x768 VGA device; stored in memory from 0x00000000 to 0x00300000 (3,145,728 i.e. 1024x768 @ 32 bpp)
+  - BIOS using interrupt 0; has text rendering capabilities, among other things
+
+RAM:
+  - Dynamically sized - default is 32mb
+  - Smallest addressable unit is the byte (8 bits)
+  - Address from VRAM's end to the next 16mb is stack space
+  - Memory from stack's end to the next 4096 bytes is reserved for the ROM (e.g. bootloader)
+  - Rest of address space is contiguous
+
+Sound card:
+  - 16-bit
+  - Optional
+
+A brief note on interrupts:
+  - The IDT is a mapping of {interrupt -> address} where address is the point to call in memory.
+    To jump back from the callback, the interrupt handler pushes the return address to the stack; the callback is responsible to call "pop ip" to return.
+  - Interrupts 0 to 16 (0xF) are reserved for hardware. The rest can be used by anyone (namely, the OS, for e.g. syscalls)
+  - The BIOS occupies interrupt 0
+  - The keyboard and mouse occupy interrupt 1
+
+BIOS:
+  - Interrupt 0
+    - When $32 = 0, set $31 to the amount of memory (in bytes)
+    - When $32 = 1, set $31 and $30 to the video resolution X and Y, respectively.
+    - When $32 = 2, display the text from $31 (which is a NUL-terminated string)
+    - When $32 = 3, clear the screen (by default black)
+
+CPU:
+  - 32 general purpose 32-bit registers
+  - 32-bit IP (instruction pointer), FLAG (CPU flags), and SP (stack pointer)
+  - IDT (Interrupt Dispatch Table) holds 256 (0-FF) places for IRQs
+
+  - Assembly syntax:
+    - $n means register #n (e.g. $16 means register 16)
+    - [addr] means the value of the memory at location addr
+    - 0x for hex literals, 0b for binary literals
+
+    - Instructions are stored as follows:
+      - one byte ubyte opcode
+      - one byte for operand types (first nibble -> first operand (0 = register, 1 = memory location, 2 = memory dereference, 3 = integer literal), second nibble -> second operand)
+      - variable number of 32-bit ints for number of operands
+
+      e.g. add $0, 10
+        OP_ADD (1 byte)
+        0b0000 0b0011 (first nibble indicates a register, second nibble indicates a literal)
+        0 (32-bit word for operand 0)
+        10 (32-bit word for literal 10)
+
+  - Instruction set:
+
+    - Move instructions
+      - Form: instr dst,src (moves src to dst)
+      - mov.8
+      - mov.16
+      - mov.32 (aliased to just "mov")
+      - mov.64 (?)
+    - zero a (set a to 0)
+    #- load/store (todo describe this because I'm lazy and I suck) (maybe do not need this since we have the [] deref)
+    - push/pop
+    - add, sub, mul, div, mod(?)
+    - shl, shr, and their signed equivalent
+    - int N (interrupt)
+    - cmp a, b (compare operands)
+    - and/or/not/xor
+
+    - Branching
+      - b (branch unconditionally)
+      - bz (branch if zero)
+      - bnz (branch if NOT zero)
+      - blt (branch if less than)
+      - bgt (branch if greater than)
+      - be (branch if equal)
+      - bne (branch if NOT equal)
