@@ -9,8 +9,7 @@
 #include "op.h"
 #include "cpu.h"
 
-
-
+/* mini instruction assembler for early testing */
 unsigned long op_emit(vm_t *vm, long op, operand_t *a, operand_t *b, unsigned long ptr)
 {
 	vm->mem[ptr++] = op;

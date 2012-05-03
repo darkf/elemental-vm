@@ -4,11 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define READ vm->mem[vm->reg[IP]++]
-#define READ_32 (vm->mem[vm->reg[IP] += 4, vm->reg[IP] - 4])
-#define ONE_OPERAND (oprA=&READ_32)
-#define TWO_OPERANDS (oprA=&READ_32, oprB=&READ_32)
-#define PEEK vm->mem[vm->reg[IP]]
+#define ONE_OPERAND (oprA=mem_read_u32(vm))
+#define TWO_OPERANDS (oprA=mem_read_u32(vm),oprB=mem_read_u32(vm))
 
 unsigned long* operand_pointer(vm_t *vm, int optype, ubyte* dat)
 {
@@ -31,10 +28,10 @@ void cpu_run(vm_t *vm)
 
 	while(1) {
 		/* read in the instruction code */
-		oper = READ;
+		oper = *mem_read_u8(vm);
 
 		/* read in the two operand-type nibbles */
-		typf = READ;
+		typf = *mem_read_u8(vm);
 		typA = (typf & 0xf0) >> 4;
 		typB = (typf & 0xf);
 
@@ -85,4 +82,16 @@ void cpu_run(vm_t *vm)
 				return;
 		}
 	}
+}
+
+inline ubyte* mem_read_u8(vm_t *vm)
+{	
+	return (ubyte *)&vm->mem[vm->reg[IP]++];
+}
+
+inline ubyte* mem_read_u32(vm_t *vm)
+{	
+	ubyte* ptr = (ubyte *)&vm->mem[vm->reg[IP]];
+	vm->reg[IP] += 4;
+	return ptr;
 }
