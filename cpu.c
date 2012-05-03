@@ -72,7 +72,7 @@ void cpu_run(vm_t *vm)
 				*operand_pointer(vm, typA, oprA) |= *operand_pointer(vm, typB, oprB);
 				break;
 			case OP_NOT:	ONE_OPERAND;
-				*operand_pointer(vm, typA, oprA) = !*operand_pointer(vm, typA, oprA);
+				*operand_pointer(vm, typA, oprA) = ~*operand_pointer(vm, typA, oprA);
 				break;
 			case OP_XOR:	TWO_OPERANDS;
 				*operand_pointer(vm, typA, oprA) ^= *operand_pointer(vm, typB, oprB);
