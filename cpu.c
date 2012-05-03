@@ -39,58 +39,47 @@ void cpu_run(vm_t *vm)
 		typB = (typf & 0xf);
 
 		switch(oper) {
-			case OP_HALT:	return;
+			case OP_HALT: return;
+
 			case OP_MOV32:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) =
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) = *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_ADD:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) +=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) += *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_SUB:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) -=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) -= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_MUL:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) *=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) *= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_DIV:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) *=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) *= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_MOD:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) %=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) %= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_SHL:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) <<=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) <<= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_SHR:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) >>=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) >>= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_AND:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) &=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) &= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_OR:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) |=
-				 *operand_pointer(vm, typB, oprB);
-			break;
+				*operand_pointer(vm, typA, oprA) |= *operand_pointer(vm, typB, oprB);
+				break;
 			case OP_NOT:	ONE_OPERAND;
-				*operand_pointer(vm, typA, oprA) = 
-				 !*operand_pointer(vm, typA, oprA);
-			break;
+				*operand_pointer(vm, typA, oprA) = !*operand_pointer(vm, typA, oprA);
+				break;
 			case OP_XOR:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) ^= 
-				 *operand_pointer(vm, typB, oprB);
-			break;
-			default:	printf("Sorry, instruction 0x%x is not in "
-					       "my repertoire at the moment.\n", oper);
-					return;
+				*operand_pointer(vm, typA, oprA) ^= *operand_pointer(vm, typB, oprB);
+				break;
+			default:
+				printf("Unknown instruction 0x%x\n", oper);
+				return;
 		}
 	}
 }
