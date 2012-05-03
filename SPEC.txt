@@ -33,10 +33,15 @@ CPU:
   - IDT (Interrupt Dispatch Table) holds 256 (0-FF) places for IRQs
 
   - Flags:
+
     ZF (Zero Flag)
     OF (Overflow Flag)
     CF (Carry Flag)
     EF (Error Flag)
+    SF (Sign Flag)
+
+    Based on x86 flags. See here:
+    http://en.wikibooks.org/wiki/X86_Assembly/X86_Architecture#EFLAGS_Register
 
   - Assembly syntax:
     - $n means register #n (e.g. $16 means register 16)
@@ -69,6 +74,9 @@ CPU:
     - shl, shr, and their signed equivalent
     - int N (interrupt)
     - cmp a, b (compare operands)
+	a is subtracted from b and then flags are set.
+	Based on x86 CMP, see here:
+        http://en.wikibooks.org/wiki/X86_Assembly/Control_Flow#Comparison_Instructions
     - and/or/not/xor
     - halt
 
@@ -80,3 +88,8 @@ CPU:
       - bgt (branch if greater than)
       - be (branch if equal)
       - bne (branch if NOT equal)
+
+    Again the plan seems to be to copy x86...
+    Refer to:
+	http://en.wikibooks.org/wiki/X86_Assembly/Control_Flow
+

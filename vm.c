@@ -38,17 +38,25 @@ unsigned long op_emit(vm_t *vm, long op, operand_t *a, operand_t *b, unsigned lo
 
 void load_program(vm_t *vm, unsigned long ptr)
 {
-	operand_t a, b, c;
+	operand_t a, b, c, d, e;
 	vm->reg[IP] = ptr;
 
 	long_to_register(&a, 0); /* reg 0 */
-	long_to_register(&b, 1); /* reg 1 */
-	long_to_literal(&c, 123456789);
+	long_to_literal(&b, 0);
+	long_to_literal(&c, 1);
+	long_to_literal(&d, 10);
 
-	ptr = op_emit(vm, OP_MOV32, &a, &c, ptr);
-	ptr = op_emit(vm, OP_MOV32, &b, &a, ptr);
-	ptr = op_emit(vm, OP_ZERO, &a, NULL, ptr);
-
+	/*
+			mov $0, 0
+	 	loop:	add $0, 1
+			cmp $0, 10
+			blt loop
+	*/
+	ptr = op_emit(vm, OP_MOV32, &a, &b, ptr);
+	long_to_literal(&e, ptr);
+	ptr = op_emit(vm, OP_ADD, &a, &c, ptr);
+	ptr = op_emit(vm, OP_CMP, &a, &d, ptr);
+	ptr = op_emit(vm, OP_BLT, &e, NULL, ptr);
 	op_emit(vm, OP_HALT, NULL, NULL, ptr);
 }
 

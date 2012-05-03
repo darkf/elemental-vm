@@ -1,11 +1,30 @@
 #include "vm.h"
 #include "cpu.h"
 #include "op.h"
+#include "flags.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #define ONE_OPERAND (oprA=mem_read_u32(vm))
 #define TWO_OPERANDS (oprA=mem_read_u32(vm),oprB=mem_read_u32(vm))
+
+/*
+	Flags and conditional branching are yet another
+	semi-x86-ripoff. For reference, see
+	- http://en.wikibooks.org/wiki/X86_Assembly/X86_Architecture#EFLAGS_Register
+	- http://en.wikibooks.org/wiki/X86_Assembly/Control_Flow
+	as well as the elemental-vm spec, SPEC.txt.
+*/
+
+void set_flag(vm_t *vm, int flag, int value) {
+	vm->reg[FLAG] &= ~(1 << flag);
+	vm->reg[FLAG] |= (value << flag);
+}
+
+ubyte get_flag(vm_t* vm, int flag) {
+	return (vm->reg[FLAG] >> flag) & 1;
+}
 
 unsigned long* operand_pointer(vm_t *vm, int optype, ubyte* dat)
 {
@@ -24,6 +43,7 @@ unsigned long* operand_pointer(vm_t *vm, int optype, ubyte* dat)
 void cpu_run(vm_t *vm)
 {
 	int oper, typf, typA, typB;
+	unsigned long long temp;
 	ubyte *oprA, *oprB;
 
 	while(1) {
@@ -37,6 +57,8 @@ void cpu_run(vm_t *vm)
 
 		switch(oper) {
 			case OP_HALT: return;
+
+			/* TODO: Do standard arithmetic operations set flags ??? */
 
 			case OP_MOV32:	TWO_OPERANDS;
 				*operand_pointer(vm, typA, oprA) = *operand_pointer(vm, typB, oprB);
@@ -77,21 +99,72 @@ void cpu_run(vm_t *vm)
 			case OP_ZERO:	ONE_OPERAND;
 				*operand_pointer(vm, typA, oprA) = 0;
 				break;
+			case OP_CMP:	TWO_OPERANDS;
+				/* CMP instruction based on the one
+				   in the x86 book linked above */
+				temp = *operand_pointer(vm, typA, oprA) - *operand_pointer(vm, typB, oprB);
+				set_flag(vm, ZF,
+					*operand_pointer(vm, typA, oprA) ==
+					 *operand_pointer(vm, typB, oprB));
+				set_flag(vm, OF, temp > ULONG_MAX &&
+					(*operand_pointer(vm, typA, oprA) >
+					 *operand_pointer(vm, typB, oprB)));
+				set_flag(vm, CF,
+					*operand_pointer(vm, typB, oprB) >
+					 *operand_pointer(vm, typA, oprA));
+				set_flag(vm, SF,
+					*operand_pointer(vm, typB, oprB) >
+					 *operand_pointer(vm, typA, oprA));
+				break;
+			case OP_B: ONE_OPERAND;
+				do_branch:
+				vm->reg[IP] = *operand_pointer(vm, typA, oprA);
+				break;
+
+			/* the flag conditions are taken
+			   from the conditional branching
+			   page of the x86 book linked
+			   above */
+
+			case OP_BZ: ONE_OPERAND;
+				if(get_flag(vm, ZF))	goto do_branch;
+				break;
+			case OP_BNZ: ONE_OPERAND;
+				if(!get_flag(vm, ZF))	goto do_branch;
+				break;
+			case OP_BLT: ONE_OPERAND;
+				if(get_flag(vm, SF) !=
+				   get_flag(vm, OF))	goto do_branch;
+				break;
+			case OP_BGT: ONE_OPERAND;
+				if(!get_flag(vm, ZF) &&
+					get_flag(vm, SF) == get_flag(vm, OF))
+					goto do_branch;
+				break;
+			case OP_BE: ONE_OPERAND;
+				if(get_flag(vm, ZF))	goto do_branch;
+				break;
+			case OP_BNE: ONE_OPERAND;
+				if(!get_flag(vm, ZF))	goto do_branch;
+				break;
 			default:
-				printf("Unknown instruction 0x%x\n", oper);
+				printf("Unknown instruction 0x%x (%s)",
+					oper, op_tostr(oper));
+				printf(" -- halting VM\n");
 				return;
 		}
 	}
 }
 
 inline ubyte* mem_read_u8(vm_t *vm)
-{	
+{
 	return (ubyte *)&vm->mem[vm->reg[IP]++];
 }
 
 inline ubyte* mem_read_u32(vm_t *vm)
-{	
+{
 	ubyte* ptr = (ubyte *)&vm->mem[vm->reg[IP]];
 	vm->reg[IP] += 4;
 	return ptr;
 }
+
