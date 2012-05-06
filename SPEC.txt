@@ -71,6 +71,9 @@ CPU:
     #- load/store (todo describe this because I'm lazy and I suck) (maybe do not need this since we have the [] deref)
     - push/pop
     - add, sub, mul, div, mod(?)
+      These behave as their x86 counteparts do.
+      Refer to Intel x86 instruction documentation.
+
     - shl, shr, and their signed equivalent
     - int N (interrupt)
     - cmp a, b (compare operands)

@@ -42,20 +42,18 @@ void load_program(vm_t *vm, unsigned long ptr)
 	vm->reg[IP] = ptr;
 
 	long_to_register(&a, 0); /* reg 0 */
-	long_to_literal(&b, 0);
-	long_to_literal(&c, 1);
-	long_to_literal(&d, 10);
+	long_to_literal(&b, 1);
+	long_to_literal(&c, 0xfffffff);
 
 	/*
-			mov $0, 0
-	 	loop:	add $0, 1
-			cmp $0, 10
+			mov $1, 1
+	 	loop:	add $0xfffffff, 0
 			blt loop
+			halt
 	*/
 	ptr = op_emit(vm, OP_MOV32, &a, &b, ptr);
 	long_to_literal(&e, ptr);
 	ptr = op_emit(vm, OP_ADD, &a, &c, ptr);
-	ptr = op_emit(vm, OP_CMP, &a, &d, ptr);
 	ptr = op_emit(vm, OP_BLT, &e, NULL, ptr);
 	op_emit(vm, OP_HALT, NULL, NULL, ptr);
 }

@@ -26,7 +26,7 @@ ubyte get_flag(vm_t* vm, int flag) {
 	return (vm->reg[FLAG] >> flag) & 1;
 }
 
-unsigned long* operand_pointer(vm_t *vm, int optype, ubyte* dat)
+unsigned long* opptr(vm_t *vm, int optype, ubyte* dat)
 {
 	static unsigned long be32;
 	be32 = (*dat << 24) | (dat[1] << 16) | (dat[2] << 8) | dat[3];
@@ -57,68 +57,92 @@ void cpu_run(vm_t *vm)
 
 		switch(oper) {
 			case OP_HALT: return;
-
-			/* TODO: Do standard arithmetic operations set flags ??? */
-
 			case OP_MOV32:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) = *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) = *opptr(vm, typB, oprB);
 				break;
+			/* x86 ADD, SUB, etc. set flags. I have
+			   tried to properly implement what
+			   the Intel x86 spec says on
+			   flag-setting. TODO: test this */
 			case OP_ADD:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) += *operand_pointer(vm, typB, oprB);
+				temp = *opptr(vm, typA, oprA)
+					+ *opptr(vm, typB, oprB);
+				set_flag(vm, ZF, temp == 0);
+				set_flag(vm, OF, temp > ULONG_MAX);
+				set_flag(vm, CF, temp > ULONG_MAX);
+				set_flag(vm, SF, temp > (unsigned
+					long long)LONG_MAX);
+				*opptr(vm, typA, oprA) = temp;
 				break;
 			case OP_SUB:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) -= *operand_pointer(vm, typB, oprB);
+				temp = *opptr(vm, typA, oprA)
+					- *opptr(vm, typB, oprB);
+				set_flag(vm, ZF, temp == 0);
+				set_flag(vm, OF, *opptr(vm, typA, oprA)
+					> *opptr(vm, typB, oprB));
+				set_flag(vm, CF, *opptr(vm, typA, oprA)
+					> *opptr(vm, typB, oprB));
+				set_flag(vm, SF, temp > (unsigned
+					long long)INT_MAX);
+				*opptr(vm, typA, oprA) = temp;
 				break;
 			case OP_MUL:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) *= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) *= *opptr(vm, typB, oprB);
+				set_flag(vm, CF, *opptr(vm, typA, oprA) & 0xffff0000 == 0);
+				set_flag(vm, OF, *opptr(vm, typA, oprA) & 0xffff0000 == 0);
 				break;
+			/* according to Intel, DIV has "undefined" effects on
+			   flags */
 			case OP_DIV:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) /= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) /= *opptr(vm, typB, oprB);
 				break;
+			/* I don't think MOD is an actual Intel x86
+			   instruction */
 			case OP_MOD:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) %= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) %= *opptr(vm, typB, oprB);
 				break;
+			/* TODO: flags for the operations below */
 			case OP_SHL:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) <<= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) <<= *opptr(vm, typB, oprB);
 				break;
 			case OP_SHR:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) >>= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) >>= *opptr(vm, typB, oprB);
 				break;
 			case OP_AND:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) &= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) &= *opptr(vm, typB, oprB);
 				break;
 			case OP_OR:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) |= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) |= *opptr(vm, typB, oprB);
 				break;
 			case OP_NOT:	ONE_OPERAND;
-				*operand_pointer(vm, typA, oprA) = ~*operand_pointer(vm, typA, oprA);
+				*opptr(vm, typA, oprA) = ~*opptr(vm, typA, oprA);
 				break;
 			case OP_XOR:	TWO_OPERANDS;
-				*operand_pointer(vm, typA, oprA) ^= *operand_pointer(vm, typB, oprB);
+				*opptr(vm, typA, oprA) ^= *opptr(vm, typB, oprB);
 				break;
 			case OP_ZERO:	ONE_OPERAND;
-				*operand_pointer(vm, typA, oprA) = 0;
+				*opptr(vm, typA, oprA) = 0;
 				break;
 			case OP_CMP:	TWO_OPERANDS;
 				/* CMP instruction based on the one
 				   in the x86 book linked above */
-				temp = *operand_pointer(vm, typA, oprA) - *operand_pointer(vm, typB, oprB);
+				temp = *opptr(vm, typA, oprA) - *opptr(vm, typB, oprB);
 				set_flag(vm, ZF,
-					*operand_pointer(vm, typA, oprA) ==
-					 *operand_pointer(vm, typB, oprB));
+					*opptr(vm, typA, oprA) ==
+					 *opptr(vm, typB, oprB));
 				set_flag(vm, OF, temp > ULONG_MAX &&
-					(*operand_pointer(vm, typA, oprA) >
-					 *operand_pointer(vm, typB, oprB)));
+					(*opptr(vm, typA, oprA) >
+					 *opptr(vm, typB, oprB)));
 				set_flag(vm, CF,
-					*operand_pointer(vm, typB, oprB) >
-					 *operand_pointer(vm, typA, oprA));
+					*opptr(vm, typB, oprB) >
+					 *opptr(vm, typA, oprA));
 				set_flag(vm, SF,
-					*operand_pointer(vm, typB, oprB) >
-					 *operand_pointer(vm, typA, oprA));
+					*opptr(vm, typB, oprB) >
+					 *opptr(vm, typA, oprA));
 				break;
 			case OP_B: ONE_OPERAND;
 				do_branch:
-				vm->reg[IP] = *operand_pointer(vm, typA, oprA);
+				vm->reg[IP] = *opptr(vm, typA, oprA);
 				break;
 
 			/* the flag conditions are taken
